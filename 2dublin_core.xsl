@@ -30,13 +30,17 @@
         <xsl:apply-templates select="DISS_content/DISS_abstract"/>
       </dcvalue>
       <xsl:variable name="type_code" select="DISS_description/@type"/>
+      <xsl:variable name="degree" select="DISS_description/DISS_degree" />
+      <xsl:variable name="univ" select="DISS_description/DISS_institution/DISS_inst_name" />
+      <xsl:variable name="dept" select="DISS_description/DISS_institution/DISS_inst_contact" />
+      <xsl:variable name="date" select="DISS_description/DISS_dates/DISS_comp_date" />
       <xsl:choose>
         <xsl:when test="$type_code='doctoral'">
-          <dcvalue element="description">Dissertation</dcvalue>
+          <dcvalue element="description">Dissertation (<xsl:value-of select="$degree" />)--<xsl:value-of select="$univ" />, <xsl:value-of select="$dept" />, <xsl:value-of select="$date"/></dcvalue>
           <dcvalue element="type">Dissertation</dcvalue>
         </xsl:when>
         <xsl:when test="$type_code='masters'">
-          <dcvalue element="description">Thesis</dcvalue>
+          <dcvalue element="description">Thesis (<xsl:value-of select="$degree" />)--<xsl:value-of select="$univ" />, <xsl:value-of select="$dept" />, <xsl:value-of select="$date"/></dcvalue>
           <dcvalue element="type">Thesis</dcvalue>
         </xsl:when>
       </xsl:choose>

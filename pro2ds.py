@@ -3,6 +3,9 @@ from lxml import etree
 from zipfile import *
 import re, os, errno, sys, getopt
 
+""" I just found some great scope documentation @ https://wiki.dlib.indiana.edu/display/IUSW/Automated+Electronic+Thesis+and+Dissertations+Ingest
+"""
+
 destination = '.'
 embargo_codes = {'0':None, '1':6, '2':12, '3':24}
 
@@ -39,13 +42,13 @@ def main(argv=None):
             for f in os.listdir(arg):
                 try:
                     convert('/'.join((arg,f)))
-                except:
-                    print "Could not process %s" % (f)
+                except Exception as inst:
+                    print "Could not process %s\t%s" % (f,inst)
         else:
             try:
                 convert(arg)
-            except:
-                print "Could not process %s" % (arg)
+            except Exception as exception:
+                print "Could not process %s\t%s" % (arg,exception)
 
 def convert(diss_zip):
     # open zip (http://docs.python.org/library/zipfile.html)
@@ -105,10 +108,18 @@ def convert(diss_zip):
     diss = open ('/'.join((item_destination,pdf)), 'wb')
     diss.write(f.read())
     diss.close
-    manifest.append(pdf)
+    manifest.append('\t'.join((pdf,'primary:true')))
     #attachments
+    #The umi metadata only indicates the file name, not the subdirectory.
     for name in filter(re_attach.search,zip_obj.namelist()):
-        manifest.append(name)
+        attach_element = tree.find('//DISS_attachment[DISS_file_name="%s"]'
+                                   % (os.path.basename(name))
+                                   )
+        attach_desc = attach_element.findtext('DISS_file_descr')
+        if attach_desc:
+            manifest.append('\t'.join((name,':'.join(('description',attach_desc)))))
+        else:
+            manifest.append(name)
         zip_obj.extract(name,item_destination)
     
     # create contents
