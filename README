@@ -1,0 +1,3 @@
+This script recieves Proquest delivered ETD zip files and transforms them into the directory structure needed for a DSpace batch upload. Duke's embargo metadata setup is hardcoded and would need to be modified for other institutions.
+
+Perhaps someday I will make it more Pythonic and portable.
